@@ -1,3 +1,14 @@
+
+(defmacro ->
+  "method chaining."
+  [& operations]
+  (reduce
+   (fn [form operation]
+     (cons (first operation)
+           (cons form (rest operation))))
+   (first operations)
+   (rest operations)))
+
 (let [
       gulp (require :gulp)
       plugins ((require :gulp-load-plugins))
@@ -28,94 +39,75 @@
 
   (.task gulp :serve
          (fn []
-           (.pipe
+           (->
             (.src gulp :html)
-            (.webserver plugins {:livereload true, :directoryListing true}))
-           ))
+            (.pipe (.webserver plugins {:livereload true, :directoryListing true}))
+            )))
 
   (.task gulp :image
          (fn []
-           (.pipe
-            (.pipe
-             (.pipe
-              (.pipe
-               (.src gulp (.-image src))
-               (.plumber plugins
-                         {:errorHandler (.onError notify
-                                                  {:title "task: image"
-                                                   :message "Error: <%= error.message %>"})}))
-              (.imagemin plugins
-                         {:progressive true
-                          :svgoPlugins [{:removeViewBox false}]
-                          :use [(pngcrush)]}))
-             (.rename plugins {:suffix ".min"}))
-            (.dest gulp "./"))
-           ))
+           (->
+            (.src gulp (.-image src))
+            (.pipe (.plumber plugins
+                             {:errorHandler (.onError notify
+                                                      {:title "task: image"
+                                                       :message "Error: <%= error.message %>"})}))
+            (.pipe (.imagemin plugins
+                              {:progressive true
+                               :svgoPlugins [{:removeViewBox false}]
+                               :use [(pngcrush)]}))
+            (.pipe (.rename plugins {:suffix ".min"}))
+            (.pipe (.dest gulp "./"))
+            )))
 
   (.task gulp :stylus
          (fn []
-           (.pipe
-            (.pipe
-             (.pipe
-              (.pipe
-               (.pipe
-                (.pipe
-                 (.src gulp (.-stylus src))
-                 (.plumber plugins
-                           {:errorHandler (.onError notify
-                                                    {:title "task: stylus"
-                                                     :message "Error: <%= error.message %>"})}))
-                (.stylus plugins {:define {:url (.resolver stylus)}
-                                  "resolve url" true
-                                  :use [(nib)]
-                                  :import :nib
-                                  }))
-               (.dest gulp "./"))
-              (.minifyCss plugins))
-             (.rename plugins {:extname ".min.css"}))
-            (.dest gulp "./"))
-           ))
+           (->
+            (.src gulp (.-stylus src))
+            (.pipe (.plumber plugins
+                             {:errorHandler (.onError notify
+                                                      {:title "task: stylus"
+                                                       :message "Error: <%= error.message %>"})}))
+            (.pipe (.stylus plugins {:define {:url (.resolver stylus)}
+                                     "resolve url" true
+                                     :use [(nib)]
+                                     :import :nib
+                                     }))
+            (.pipe (.dest gulp "./"))
+            (.pipe (.minifyCss plugins))
+            (.pipe (.rename plugins {:extname ".min.css"}))
+            (.pipe (.dest gulp "./"))
+            )))
 
   (.task gulp :coffee
          (fn []
-           (.pipe
-            (.pipe
-             (.pipe
-              (.pipe
-               (.pipe
-                (.pipe
-                 (.pipe
-                  (.pipe
-                   (.src gulp (.-coffee src))
-                   (.plumber plugins
+           (->
+            (.src gulp (.-coffee src))
+            (.pipe (.plumber plugins
                              {:errorHandler (.onError notify
                                                       {:title "task: coffee"
                                                        :message "Error: <%= error.message %>"})}))
-                  (.newer plugins {:dest "./" :ext ".min.js"}))
-                 (.coffeelint plugins))
-                (.coffee plugins {:bare true}))
-               (.dest gulp "./"))
-              (.uglify plugins))
-             (.rename plugins {:extname ".min.js"}))
-            (.dest gulp "./"))
-           ))
+            (.pipe (.newer plugins {:dest "./" :ext ".min.js"}))
+            (.pipe (.coffeelint plugins))
+            (.pipe (.coffee plugins {:bare true}))
+            (.pipe (.dest gulp "./"))
+            (.pipe (.uglify plugins))
+            (.pipe (.rename plugins {:extname ".min.js"}))
+            (.pipe (.dest gulp "./"))
+            )))
 
   (.task gulp :riot
          (fn []
-           (.pipe
-            (.pipe
-             (.pipe
-              (.pipe
-               (.pipe
-                (.src gulp (.-riot src))
-                (.plumber plugins
-                          {:errorHandler (.onError notify
-                                                   {:title "task: riot"
-                                                    :message "Error: <%= error.message %>"})}))
-               (.newer plugins {:dest "./" :ext ".js"}))
-              (.riot plugins {:template :jade}))
-             (.rename plugins {:extname ".js"}))
-            (.dest gulp "./"))
-           ))
+           (->
+            (.src gulp (.-riot src))
+            (.pipe (.plumber plugins
+                             {:errorHandler (.onError notify
+                                                      {:title "task: riot"
+                                                       :message "Error: <%= error.message %>"})}))
+            (.pipe (.newer plugins {:dest "./" :ext ".js"}))
+            (.pipe (.riot plugins {:template :jade}))
+            (.pipe (.rename plugins {:extname ".js"}))
+            (.pipe (.dest gulp "./"))
+            )))
 
 )
