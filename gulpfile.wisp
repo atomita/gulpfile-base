@@ -38,9 +38,9 @@
         (fn [command form]
           `(.pipe ~form (~@command)))
 
-        dist
+        dest
         (fn [command form]
-          `(.pipe ~form (gulp.dist ~command)))
+          `(.pipe ~form (gulp.dest ~command)))
 
         firsts
         ((fn [commandline]
@@ -64,7 +64,7 @@
         (let [fname (symbol-value (first commandline))
               chunked (chunk (rest commandline))
               segment (first chunked)
-              command (if (= fname "|") (pipe segment form) (dist segment form))
+              command (if (= fname "|") (pipe segment form) (dest segment form))
               ]
           (recur (second chunked) command))
         form
