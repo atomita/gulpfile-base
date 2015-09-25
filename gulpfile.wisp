@@ -76,12 +76,13 @@
 (ns app.tasks
   "tasks"
   (:require [gulp]
-            [gulp-load-plugins :as plugins]
+            [gulp-load-plugins]
             [stylus]
             [nib]
             [imagemin-pngcrush :as pngcrush]))
 
 (let [
+      plugins (gulp-load-plugins)
       no-convert "!./**/{node_modules|jspm_packages}/**"
       src {:image ["./**/images/**/*.{png,jpg,jpeg,gif,svg}", "!./**/images/**/*.min.*", no-convert]
            :stylus ["./**/*.styl(us)" "!./**/_*.styl(us)" no-convert]
