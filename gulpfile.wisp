@@ -83,7 +83,7 @@
 
 (let [
       plugins (gulp-load-plugins)
-      no-convert "!./**/{node_modules|jspm_packages}/**"
+      no-convert "!./**/{node_modules,jspm_packages}/**"
       src {:image ["./**/images/**/*.{png,jpg,jpeg,gif,svg}", "!./**/images/**/*.min.*", no-convert]
            :stylus ["./**/*.styl{,us}" "!./**/_*.styl{,us}" no-convert]
            :coffee ["./**/*.coffee" no-convert]
